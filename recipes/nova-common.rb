@@ -107,6 +107,14 @@ vnc_bind_ip = address_for node["openstack"]["compute"]["libvirt"]["bind_interfac
 xvpvnc_proxy_ip = address_for node["openstack"]["compute"]["xvpvnc_proxy"]["bind_interface"]
 novnc_proxy_ip = address_for node["openstack"]["compute"]["novnc_proxy"]["bind_interface"]
 
+if node["openstack"]["compute"]["network"]["service_type"] == "quantum"
+  quantum_admin_password = user_password node["openstack"]["compute"]["network"]["quantum"]["quantum_admin_username"]
+  quantum_metadata_proxy_shared_secret = secret "secrets", "quantum-metadata-shared-secret"
+else 
+  quantum_admin_password = nil
+  quantum_metadata_proxy_shared_secret = nil
+end
+
 template "/etc/nova/nova.conf" do
   source "nova.conf.erb"
   owner node["openstack"]["compute"]["user"]
@@ -133,7 +141,9 @@ template "/etc/nova/nova.conf" do
     :glance_api_port => image_endpoint.port,
     :iscsi_helper => platform_options["iscsi_helper"],
     :scheduler_default_filters => node["openstack"]["compute"]["scheduler"]["default_filters"].join(","),
-    :osapi_compute_link_prefix => compute_api_endpoint.to_s
+    :osapi_compute_link_prefix => compute_api_endpoint.to_s,
+    :quantum_admin_password => quantum_admin_password,
+    :quantum_metadata_proxy_shared_secret => quantum_metadata_proxy_shared_secret
   )
 end
 

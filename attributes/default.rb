@@ -73,6 +73,21 @@ default["openstack"]["compute"]["region"] = "RegionOne"
 
 default["openstack"]["compute"]["floating_cmd"] = "/usr/local/bin/add_floaters.py"
 
+# Support multiple network types.  Default network type is "nova" 
+# with the other option supported being "quantum"
+default["openstack"]["compute"]["network"]["service_type"] = "nova"
+
+# Quantum options
+default["openstack"]["compute"]["network"]["quantum"]["network_api_class"] = "nova.network.quantumv2.api.API"
+default["openstack"]["compute"]["network"]["quantum"]["quantum_url"] = "http://127.0.0.1:9696"
+default["openstack"]["compute"]["network"]["quantum"]["quantum_auth_strategy"] = "keystone"
+default["openstack"]["compute"]["network"]["quantum"]["quantum_admin_tenant_name"] = "service"
+default["openstack"]["compute"]["network"]["quantum"]["quantum_admin_username"] = "quantum"
+default["openstack"]["compute"]["network"]["quantum"]["libvirt_vif_driver"] = "nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver"
+default["openstack"]["compute"]["network"]["quantum"]["linuxnet_interface_driver"] = "nova.network.linux_net.LinuxOVSInterfaceDriver"
+default["openstack"]["compute"]["network"]["quantum"]["security_group_api"] = "quantum"
+default["openstack"]["compute"]["network"]["quantum"]["service_quantum_metadata_proxy"] = true
+
 # TODO(shep): This should probably be ["openstack"]["compute"]["network"]["fixed"]
 default["openstack"]["compute"]["networks"] = [
   {
@@ -277,6 +292,7 @@ when "ubuntu"
     "compute_api_metadata_process_name" => "nova-api-metadata",
     "compute_compute_packages" => ["nova-compute"],
     "compute_compute_service" => "nova-compute",
+    "compute_network_quantum_packages" => ["vlan", "bridge-utils", "openvswitch-switch", "openvswitch-datapath-dkms", "quantum-plugin-openvswitch-agent"],
     "compute_network_packages" => ["iptables", "nova-network"],
     "compute_network_service" => "nova-network",
     "compute_scheduler_packages" => ["nova-scheduler"],
